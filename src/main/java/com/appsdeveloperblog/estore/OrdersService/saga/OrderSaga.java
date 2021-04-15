@@ -5,12 +5,14 @@ import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.commandhandling.CommandResultMessage;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.modelling.saga.SagaEventHandler;
+import org.axonframework.modelling.saga.SagaLifecycle;
 import org.axonframework.modelling.saga.StartSaga;
 import org.axonframework.spring.stereotype.Saga;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.appsdeveloperblog.estore.OrdersService.core.events.OrderCreatedEvent;
 import com.appsdeveloperblog.estore.core.commands.ReserveProductCommand;
+import com.appsdeveloperblog.estore.core.events.ProductReservedEvent;
 
 @Saga
 public class OrderSaga {
@@ -29,6 +31,8 @@ public class OrderSaga {
 				.userId(orderCreatedEvent.getUserId())
 				.build();
 		
+		SagaLifecycle.associateWith("productId", orderCreatedEvent.getProductId());
+		
 		commandGateway.send(reserveProductCommand, new CommandCallback<ReserveProductCommand, Object>() {
 
 			@Override
@@ -43,6 +47,13 @@ public class OrderSaga {
 		});
 		
  
+	}
+	
+	@SagaEventHandler(associationProperty="productId")
+	public void handle(ProductReservedEvent productReservedEvent) {
+		
+		// Process user payment
+		
 	}
 
 }
