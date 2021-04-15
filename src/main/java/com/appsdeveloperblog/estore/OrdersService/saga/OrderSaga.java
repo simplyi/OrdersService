@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.appsdeveloperblog.estore.OrdersService.core.events.OrderCreatedEvent;
 import com.appsdeveloperblog.estore.core.commands.ReserveProductCommand;
+import com.appsdeveloperblog.estore.core.events.ProductReservedEvent;
 
 @Saga
 public class OrderSaga {
@@ -43,6 +44,11 @@ public class OrderSaga {
 		});
 		
  
+	}
+	
+	@SagaEventHandler(associationProperty="orderId")
+	public void handle(ProductReservedEvent productReservedEvent) {
+		// Process user payment
 	}
 
 }
