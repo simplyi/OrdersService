@@ -6,6 +6,7 @@
 package com.appsdeveloperblog.estore.OrdersService.command;
 
 import com.appsdeveloperblog.estore.OrdersService.core.events.OrderCreatedEvent;
+import com.appsdeveloperblog.estore.OrdersService.command.commands.ApproveOrderCommand;
 import com.appsdeveloperblog.estore.OrdersService.command.commands.CreateOrderCommand;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -42,6 +43,11 @@ public class OrderAggregate {
         this.userId = orderCreatedEvent.getUserId();
         this.addressId = orderCreatedEvent.getAddressId();
         this.quantity = orderCreatedEvent.getQuantity();
+    }
+    
+    @CommandHandler
+    public void handle(ApproveOrderCommand approveOrderCommand) {
+    	// Create and publish the OrderApprovedEvent
     }
  
 
