@@ -40,7 +40,7 @@ public class OrderAggregate {
     }
 
     @EventSourcingHandler
-    protected void on(OrderCreatedEvent orderCreatedEvent) throws Exception {
+    public void on(OrderCreatedEvent orderCreatedEvent) throws Exception {
         this.orderId = orderCreatedEvent.getOrderId();
         this.productId = orderCreatedEvent.getProductId();
         this.userId = orderCreatedEvent.getUserId();
@@ -59,7 +59,7 @@ public class OrderAggregate {
     }
     
     @EventSourcingHandler
-    protected void on(OrderApprovedEvent orderApprovedEvent) {
+    public void on(OrderApprovedEvent orderApprovedEvent) {
     	this.orderStatus = orderApprovedEvent.getOrderStatus();
     }
  
