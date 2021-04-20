@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.appsdeveloperblog.estore.OrdersService.command.commands.ApproveOrderCommand;
 import com.appsdeveloperblog.estore.OrdersService.core.events.OrderCreatedEvent;
 import com.appsdeveloperblog.estore.core.commands.ProcessPaymentCommand;
 import com.appsdeveloperblog.estore.core.commands.ReserveProductCommand;
@@ -117,6 +118,10 @@ public class OrderSaga {
 	@SagaEventHandler(associationProperty="orderId")
 	public void handle(PaymentProcessedEvent paymentProcessedEvent) {
 		// Send an ApproveOrderCommand
+		ApproveOrderCommand approveOrderCommand = 
+				new ApproveOrderCommand(paymentProcessedEvent.getOrderId());
+		
+		commandGateway.send(approveOrderCommand);
 	}
 
 	
