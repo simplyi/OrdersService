@@ -25,6 +25,7 @@ import com.appsdeveloperblog.estore.core.commands.CancelProductReservationComman
 import com.appsdeveloperblog.estore.core.commands.ProcessPaymentCommand;
 import com.appsdeveloperblog.estore.core.commands.ReserveProductCommand;
 import com.appsdeveloperblog.estore.core.events.PaymentProcessedEvent;
+import com.appsdeveloperblog.estore.core.events.ProductReservationCancelledEvent;
 import com.appsdeveloperblog.estore.core.events.ProductReservedEvent;
 import com.appsdeveloperblog.estore.core.model.User;
 import com.appsdeveloperblog.estore.core.query.FetchUserPaymentDetailsQuery;
@@ -156,6 +157,9 @@ public class OrderSaga {
 	    //SagaLifecycle.end();
 	}
 
-	
+	@SagaEventHandler(associationProperty="orderId")
+	public void handle(ProductReservationCancelledEvent productReservationCancelledEvent) {
+		// Create and send a RejectOrderCommand
+	}
 	
 }
