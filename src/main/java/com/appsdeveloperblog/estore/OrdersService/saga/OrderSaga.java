@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.appsdeveloperblog.estore.OrdersService.command.commands.ApproveOrderCommand;
+import com.appsdeveloperblog.estore.OrdersService.command.commands.RejectOrderCommand;
 import com.appsdeveloperblog.estore.OrdersService.core.events.OrderApprovedEvent;
 import com.appsdeveloperblog.estore.OrdersService.core.events.OrderCreatedEvent;
 import com.appsdeveloperblog.estore.core.commands.CancelProductReservationCommand;
@@ -160,6 +161,10 @@ public class OrderSaga {
 	@SagaEventHandler(associationProperty="orderId")
 	public void handle(ProductReservationCancelledEvent productReservationCancelledEvent) {
 		// Create and send a RejectOrderCommand
+		RejectOrderCommand rejectOrderCommand = new RejectOrderCommand(productReservationCancelledEvent.getOrderId(),
+				productReservationCancelledEvent.getReason());
+		
+		commandGateway.send(rejectOrderCommand);
 	}
 	
 }
