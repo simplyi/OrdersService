@@ -10,6 +10,7 @@ import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.commandhandling.CommandResultMessage;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.deadline.DeadlineManager;
+import org.axonframework.deadline.annotation.DeadlineHandler;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.modelling.saga.EndSaga;
 import org.axonframework.modelling.saga.SagaEventHandler;
@@ -48,6 +49,8 @@ public class OrderSaga {
 	private transient DeadlineManager deadlineManager;
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(OrderSaga.class);
+	
+	private final String PAYMENT_PROCESSING_TIMEOUT_DEADLINE="payment-processing-deadline";
 	
 	@StartSaga
 	@SagaEventHandler(associationProperty="orderId")
@@ -110,7 +113,7 @@ public class OrderSaga {
         
         
         deadlineManager.schedule(Duration.of(10, ChronoUnit.SECONDS),
-        		"payment-processing-deadline", productReservedEvent);
+        		PAYMENT_PROCESSING_TIMEOUT_DEADLINE, productReservedEvent);
         
         if(true) return;
         
@@ -158,7 +161,7 @@ public class OrderSaga {
 	@SagaEventHandler(associationProperty="orderId")
 	public void handle(PaymentProcessedEvent paymentProcessedEvent) {
 		
-		deadlineManager.cancelAll("payment-processing-deadline");
+		deadlineManager.cancelAll(PAYMENT_PROCESSING_TIMEOUT_DEADLINE);
 		
 		// Send an ApproveOrderCommand
 		ApproveOrderCommand approveOrderCommand = 
@@ -187,6 +190,12 @@ public class OrderSaga {
 	@SagaEventHandler(associationProperty="orderId")
 	public void handle(OrderRejectedEvent orderRejectedEvent) {
 		LOGGER.info("Successfully rejected order with id " + orderRejectedEvent.getOrderId());
+	}
+	
+	@DeadlineHandler(deadlineName=PAYMENT_PROCESSING_TIMEOUT_DEADLINE)
+	public void handlePaymentDeadline(ProductReservedEvent productReservedEvent) {
+		LOGGER.info("Payment processing deadline took place. Sending a compensating command to cancel the product reservation");
+		cancelProductReservation(productReservedEvent, "Payment timeout");
 	}
 	
 }
