@@ -52,6 +52,8 @@ public class OrderSaga {
 	
 	private final String PAYMENT_PROCESSING_TIMEOUT_DEADLINE="payment-processing-deadline";
 	
+	private String scheduleId;
+	
 	@StartSaga
 	@SagaEventHandler(associationProperty="orderId")
 	public void handle(OrderCreatedEvent orderCreatedEvent) {
@@ -112,12 +114,9 @@ public class OrderSaga {
         LOGGER.info("Successfully fetched user payment details for user " + userPaymentDetails.getFirstName());
         
         
-        deadlineManager.schedule(Duration.of(10, ChronoUnit.SECONDS),
+       scheduleId =  deadlineManager.schedule(Duration.of(120, ChronoUnit.SECONDS),
         		PAYMENT_PROCESSING_TIMEOUT_DEADLINE, productReservedEvent);
-        
-        if(true) return;
-        
-        
+   
         ProcessPaymentCommand proccessPaymentCommand = ProcessPaymentCommand.builder()
         		.orderId(productReservedEvent.getOrderId())
         		.paymentDetails(userPaymentDetails.getPaymentDetails())
@@ -144,6 +143,8 @@ public class OrderSaga {
 	
 	private void cancelProductReservation(ProductReservedEvent productReservedEvent, String reason) {
 		
+		cancelDeadline();
+		
 		CancelProductReservationCommand publishProductReservationCommand = 
 				CancelProductReservationCommand.builder()
 				.orderId(productReservedEvent.getOrderId())
@@ -161,13 +162,20 @@ public class OrderSaga {
 	@SagaEventHandler(associationProperty="orderId")
 	public void handle(PaymentProcessedEvent paymentProcessedEvent) {
 		
-		deadlineManager.cancelAll(PAYMENT_PROCESSING_TIMEOUT_DEADLINE);
+		cancelDeadline();
 		
 		// Send an ApproveOrderCommand
 		ApproveOrderCommand approveOrderCommand = 
 				new ApproveOrderCommand(paymentProcessedEvent.getOrderId());
 		
 		commandGateway.send(approveOrderCommand);
+	}
+	
+	private void cancelDeadline() {
+		if (scheduleId != null) { 
+			deadlineManager.cancelSchedule(PAYMENT_PROCESSING_TIMEOUT_DEADLINE, scheduleId);
+			scheduleId = null;
+		}
 	}
 	
 	@EndSaga
