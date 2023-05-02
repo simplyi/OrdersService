@@ -6,13 +6,15 @@
 package com.appsdeveloperblog.estore.OrdersService.core.data;
 
 import com.appsdeveloperblog.estore.OrdersService.core.model.OrderStatus;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.io.Serializable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import lombok.Data;
 
 @Data
